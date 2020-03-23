@@ -10,6 +10,8 @@ usage='setup.sh [AWS_PROFILE]
        Creates the policies and roles with the mistaken use of NotAction
 '
 
+echo 'WARNING: This script creates a user with prefix marketing-dave which is insecure for demonstration purposes.'
+
 set -xe
 
 PROJECT_TAG='{ "Key"="project", "Value"="LAB_1_Lambda" }'
@@ -75,6 +77,13 @@ fi
 POLICY_NAME=update_iam_policy_${RAND}
 set_var POLICY_NAME $POLICY_NAME
 set_var DISCOVERED_ROLE_NAME discovered_role_with_iam_privs_${RAND}
+
+aws iam create-user --user-name $USER_NAME
+aws iam add-user-to-group --user-name $USER_NAME --group-name ${GROUP_NAME}
+aws iam create-access-key --user-name $USER_NAME > keys.json
+
+export AWS_SECRET_ACCESS_KEY=`cat keys.json | jq '.AccessKeyId'`
+export AWS_ACCESS_KEY_ID=`cat keys.json | jq '.SecretKey'`
 
 aws iam create-role --role-name discovered_role_with_iam_privs-${RAND} --assume-role-policy-document file://lambda_assume_policy_doc.json 
 aws iam tag-role --role-name discovered_role_with_iam_privs-${RAND} --tags "${PROJECT_TAG}" || echo "Tagging not supported"

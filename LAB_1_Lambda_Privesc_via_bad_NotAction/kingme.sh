@@ -2,7 +2,6 @@
 
 source env.sh
 
-echo 'WARNING: This script creates a user with prefix marketing-dave which is insecure for demonstration purposes.
 It also creates a high privilege Lambda.
 Be sure to delete the user and lambda afterwards by passing --delete to this script.'
 
@@ -18,13 +17,7 @@ if [ $1 == "--delete" ]; then
   exit 0
 fi
 
-aws iam create-user --user-name $USER_NAME
-aws iam add-user-to-group --user-name $USER_NAME --group-name ${GROUP_NAME}
-aws iam create-access-key --user-name $USER_NAME > keys.json
 
-
-export AWS_SECRET_ACCESS_KEY=`cat keys.json | jq '.AccessKeyId'`
-export AWS_ACCESS_KEY_ID=`cat keys.json | jq '.SecretKey'`
 
 
 
