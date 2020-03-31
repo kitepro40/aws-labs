@@ -25,10 +25,10 @@ function set_var(){
     varname=$1
     varvalue=$2
     if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        sed -i "s|^${varname}=$|${varname}=${varvalue}|" env.sh
+        sed -i 's|^${varname}=$|${varname}=${varvalue}|' env.sh
         # ...
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' "s|^${varname}=$|${varname}=${varvalue}|" env.sh
+        sed -i '' 's|^${varname}=$|${varname}=${varvalue}|' env.sh
             # Mac OSX
     else
         echo "os $OSTYPE not supported"
@@ -77,6 +77,11 @@ fi
 POLICY_NAME=update_iam_policy_${RAND}
 set_var POLICY_NAME $POLICY_NAME
 set_var DISCOVERED_ROLE_NAME discovered_role_with_iam_privs_${RAND}
+
+USER_NAME=marketing-dave-${RAND}
+
+# must match group name in create_groups.sh
+GROUP_NAME=PowerUserAccess-marketing-group-${RAND}
 
 aws iam create-user --user-name $USER_NAME
 aws iam add-user-to-group --user-name $USER_NAME --group-name ${GROUP_NAME}

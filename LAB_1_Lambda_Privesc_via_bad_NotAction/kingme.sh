@@ -2,15 +2,14 @@
 
 source env.sh
 
-It also creates a high privilege Lambda.
-Be sure to delete the user and lambda afterwards by passing --delete to this script.'
+echo 'Be sure to delete the user and lambda afterwards by passing --delete to this script.'
 
 role_arn=`aws iam get-role --role-name ${DISCOVERED_ROLE_NAME} | jq '.Role.Arn'  | sed 's|\"||g'`
 
-# must match group name in create_groups.sh
-GROUP_NAME=PowerUserAccess-marketing-group-${RAND}
 
-USER_NAME=marketing-dave-${RAND}
+
+
+
 
 if [ $1 == "--delete" ]; then
   aws iam delete-user --user-name $USER_NAME
