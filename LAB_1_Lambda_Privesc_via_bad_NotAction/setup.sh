@@ -25,10 +25,10 @@ function set_var(){
     varname=$1
     varvalue=$2
     if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        sed -i 's|^${varname}=$|${varname}=${varvalue}|' env.sh
+        sed -i "s/$varname=$/$varname=$varvalue/" env.sh
         # ...
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' 's|^${varname}=$|${varname}=${varvalue}|' env.sh
+        sed -i '' "s|$varname=$|$varname=$varvalue|" env.sh
             # Mac OSX
     else
         echo "os $OSTYPE not supported"
@@ -77,26 +77,26 @@ fi
 POLICY_NAME=update_iam_policy_${RAND}
 set_var POLICY_NAME $POLICY_NAME
 set_var DISCOVERED_ROLE_NAME discovered_role_with_iam_privs_${RAND}
-
-USER_NAME=marketing-dave-${RAND}
+set_var USER_NAME marketing-dave-${RAND}
 
 # must match group name in create_groups.sh
 GROUP_NAME=PowerUserAccess-marketing-group-${RAND}
 
-aws iam create-user --user-name $USER_NAME
+aws iam create-user --user-name ${USER_NAME}
+./create_group.sh
 aws iam add-user-to-group --user-name $USER_NAME --group-name ${GROUP_NAME}
 aws iam create-access-key --user-name $USER_NAME > keys.json
 
-export AWS_SECRET_ACCESS_KEY=`cat keys.json | jq '.AccessKeyId'`
-export AWS_ACCESS_KEY_ID=`cat keys.json | jq '.SecretKey'`
+export AWS_SECRET_ACCESS_KEY=`cat keys.json | jq -r '.AccessKey.SecretAccessKey'`
+export AWS_ACCESS_KEY_ID=`cat keys.json | jq -r '.AccessKey.AccessKeyId'`
 
 aws iam create-role --role-name discovered_role_with_iam_privs-${RAND} --assume-role-policy-document file://lambda_assume_policy_doc.json 
 aws iam tag-role --role-name discovered_role_with_iam_privs-${RAND} --tags "${PROJECT_TAG}" || echo "Tagging not supported"
-aws iam create-policy --policy-name "${POLICY_NAME}" --policy-document file://lambda_permissions_policy_doc.json > ${POLICY_NAME}_output.json
+aws iam create-policy --policy-name ${POLICY_NAME} --policy-document file://lambda_permissions_policy_doc.json > ${POLICY_NAME}_output.json
 policy_arn=`cat ${POLICY_NAME}_output.json | jq '.Policy.Arn' | sed 's/\"//g' ` 
 echo "policy_arn=${policy_arn}"
 set_var POLICY_ARN ${policy_arn}
-aws iam attach-role-policy --role-name discovered_role_with_iam_privs-${RAND} --policy-arn "${policy_arn}"
+aws iam attach-role-policy --role-name discovered_role_with_iam_privs-${RAND} --policy-arn ${policy_arn}
 aws iam list-attached-role-policies --role-name discovered_role_with_iam_privs-${RAND}
 aws iam list-policies | grep update
 

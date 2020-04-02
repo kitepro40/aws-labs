@@ -13,7 +13,8 @@ POLICY_ARN=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${POLICY_NAME}
 if [ $1 == "--delete" ]; then
  aws iam detach-group-policy --group-name $GROUP_NAME --policy-arn arn:aws:iam::aws:policy/AmazonSQSFullAccess
  aws iam detach-group-policy --group-name $GROUP_NAME --policy-arn arn:aws:iam::aws:policy/AWSLambdaFullAccess
- #aws iam delete-group-policy --group-name $GROUP_NAME --policy-arn $POLICY_ARN 
+ aws iam delete-group-policy --policy-name $POLICY_NAME --group-name $GROUP_NAME
+ aws iam remove-user-from-group --user-name $USER_NAME --group-name $GROUP_NAME
  aws iam delete-group --group-name $GROUP_NAME
  exit 0
 fi
