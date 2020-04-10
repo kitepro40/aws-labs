@@ -2,7 +2,7 @@
 
 This lab covers the following scenario:
 
-* An attacker disovers user credentials for marketing-dave which allows lambda management.
+* An attacker discovers user credentials for marketing-dave which allows lambda management.
 * Due to a flaw in the policy intended to restrict marketing-dave's ability to modify IAM privileges, the attacker can priv-esc to admin by launching a lambda with high privileges.
 * The attacker discovers a secret in an S3 bucket after granting themselves S3 privileges to modify bucket policies
 
@@ -48,24 +48,23 @@ Notice the NotAction in the PolicyDocument.
 See the answer in [Answers/Readme_Theory.md](Answers/Readme_Theory.md)
 
 
-We will explore this with a scenario where an attaker has obtained the credentials to a user `marketing-dave`.
+We will explore this with a scenario where an attacker has obtained the credentials to a user `marketing-dave`.
 who is part of the PowerUsers-marketing-group. We will demonstrate how the policy above can be abused to
 create a lambda function with a high-privileged role to elevate dave's own privileges.
 
 
-1. Using admin creds, Create the roles and policies to simulate discovered high-privilege 
+1. Using admin creds, Create the roles and policies to simulate discovered high-privilege .
 
     ./setup.sh
 
-2. Explore your own AWS account to discover high-privileged roles that might be used in your account.
-   ./recon.sh
+2. Using dave's credentials, create the lambda function using the `discovered_role_with_iam_privs` role.
 
-3. Using dave's credentials, create the lambda function using the `discovered_role_with_iam_privs` role
    ./kingme.sh
 
-4. Once you are king (IAM boss), you can give yourself S3 Full Access privileges. Then you can list buckets.
+3. Once you are king (IAM boss), you can give yourself S3 Full Access privileges. Then you can list buckets.
 You will need to [change the bucket IAM policy](https://aws.amazon.com/blogs/security/how-to-restrict-amazon-s3-bucket-access-to-a-specific-iam-role/) 
 to grant yourself access to the bucket.
+
 
 
 ## Part II: Fixing the Problem (WIP)
